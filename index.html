@@ -2,34 +2,475 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>回転量ビジュアライザー | Ballroom Rotation Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BALLROOM ROTATION LAB - 回転量ビジュアライザー</title>
 <style>
-:root{color-scheme:dark;--bg:#080d19;--panel:#131d30;--panel2:#19263c;--line:#30415c;--text:#f4f7ff;--muted:#aabbd3;--a:#5fe0d1;--b:#ffbb73;--shadow:0 18px 50px #0005}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Meiryo,"Yu Gothic",system-ui,sans-serif;background:radial-gradient(ellipse at 50% -15%,#1a3850 0%,transparent 55%),var(--bg);color:var(--text);line-height:1.65}button,input{font:inherit}button{cursor:pointer}header{position:sticky;top:0;z-index:10;backdrop-filter:blur(16px);background:#080d19df;border-bottom:1px solid #30415c;padding:12px max(18px,calc((100vw - 1100px)/2))}.brand{font-size:clamp(15px,2.7vw,20px);font-weight:800;letter-spacing:.04em}.brand small{font-size:11px;display:block;color:var(--a);letter-spacing:.16em}main{max-width:1100px;margin:auto;padding:24px 16px 80px}.intro{margin-bottom:20px}.intro h1{font-size:clamp(23px,5vw,38px);line-height:1.35;margin:8px 0}.intro p{color:var(--muted);margin:0}.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:18px}.card{border:1px solid var(--line);border-radius:23px;background:linear-gradient(150deg,#17243a,#10192b);box-shadow:var(--shadow);padding:clamp(16px,3vw,27px);min-width:0}.eyebrow{font-size:12px;letter-spacing:.13em;color:var(--a);font-weight:800}.canvas-wrap{max-width:500px;margin:auto}svg{display:block;width:100%;height:auto;overflow:visible}.degree{font-size:clamp(46px,9vw,74px);font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.05em}.degree small{font-size:24px;color:var(--muted);letter-spacing:0}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}.metric{border:1px solid var(--line);border-radius:15px;background:#0a1526;padding:12px}.metric label{display:block;color:var(--muted);font-size:12px}.metric strong{font-size:clamp(17px,3vw,23px);color:#fff}.controls{display:flex;flex-direction:column;gap:18px}.section-label{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px}.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.seg button,.presets button,.smallbtn{border:1px solid #40516c;border-radius:12px;background:#1d2b41;color:#f3f7ff;padding:11px 8px;font-weight:750;transition:background .15s,transform .15s}.seg button[aria-pressed="true"],.presets button[aria-pressed="true"]{background:#124c51;border-color:var(--a);color:#bafff4}.seg button:active,.presets button:active,.smallbtn:active{transform:scale(.97)}.slider-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.slider-top output{font-weight:900;color:var(--a);font-size:22px;font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--a);height:35px;cursor:pointer;touch-action:pan-y}.scale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}.presets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.presets button{padding:10px 4px;min-height:65px}.presets button span{display:block;font-size:12px;color:#b8c9dd;font-weight:500}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.smallbtn{flex:1;min-width:105px}.note{color:var(--muted);font-size:13px;margin-top:14px}.guide{margin-top:18px}.guide h2{font-size:19px;margin:0 0 12px}.guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.guide-item{background:#0b1627;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:13px}.guide-item b{display:block;color:var(--a);margin-bottom:5px}footer{text-align:center;color:var(--muted);font-size:12px;margin-top:28px}button:focus-visible,input:focus-visible{outline:3px solid #fff;outline-offset:3px}@media(max-width:740px){main{padding:18px 12px 65px}.layout{grid-template-columns:1fr}.card{border-radius:18px}.guide-grid{grid-template-columns:1fr}.degree{font-size:56px}.presets{gap:6px}.presets button{font-size:14px}.canvas-wrap{max-width:420px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  :root {
+    --bg-dark: #0b0f17;
+    --card-bg: #131926;
+    --sub-card-bg: #1a2234;
+    --border-color: #252f44;
+    --accent-teal: #2dd4bf;
+    --accent-teal-dim: rgba(45, 212, 191, 0.15);
+    --accent-orange: #f97316;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    height: 100%;
+    height: 100dvh; /* スマホのアドレスバーを考慮した画面いっぱい表示 */
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    overflow: hidden;
+  }
+
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 12px 14px 16px;
+  }
+
+  /* ヘッダー */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+
+  .brand-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--accent-teal);
+  }
+
+  .app-subtitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  /* メインカード（縦いっぱいに伸ばす） */
+  .main-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 14px;
+    margin-top: 10px;
+    min-height: 0;
+  }
+
+  .card-top-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent-teal);
+    flex-shrink: 0;
+  }
+
+  /* 円グラフエリア（余白に合わせて拡大） */
+  .visualizer-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    padding: 4px 0;
+  }
+
+  .start-dir-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .svg-wrapper {
+    width: 100%;
+    height: 100%;
+    max-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+    max-width: 280px;
+    max-height: 280px;
+    overflow: visible;
+  }
+
+  /* 角度表示とバッジ */
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0 12px;
+    flex-shrink: 0;
+  }
+
+  .degree-display {
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .status-badge {
+    background-color: var(--accent-teal-dim);
+    border: 1px solid var(--accent-teal);
+    color: var(--accent-teal);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* スライダーボックス */
+  .control-box {
+    background-color: var(--sub-card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+
+  .box-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #2b354b;
+    border-radius: 3px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  }
+
+  /* 下部2カラムコントロール */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .grid-box {
+    background-color: var(--sub-card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 11px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .grid-box-title {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .fraction-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .dir-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    height: 100%;
+  }
+
+  button {
+    background-color: #131926;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 10px 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  button.active {
+    background-color: var(--accent-teal-dim);
+    border-color: var(--accent-teal);
+    color: var(--accent-teal);
+  }
+
+  .dir-grid button {
+    padding: 12px 4px;
+    font-size: 12px;
+  }
 </style>
 </head>
 <body>
-<header><div class="brand"><small>BALLROOM ROTATION LAB</small>回転量ビジュアライザー</div></header>
-<main>
-<section class="intro"><div class="eyebrow">INTERACTIVE LEARNING TOOL</div><h1>回転量を、目で見て理解する。</h1><p>スライダーを動かすと、回転の向き・角度・分数が連動します。</p></section>
-<div class="layout">
-<section class="card" aria-label="回転量の図解"><div class="eyebrow">LIVE ROTATION</div><div class="canvas-wrap"><svg id="dial" viewBox="0 0 440 440" role="img" aria-label="回転量を示す円形図"><defs><marker id="arrowA" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L6 3 L0 6 Z" fill="#5fe0d1"/></marker></defs><circle cx="220" cy="220" r="161" fill="#0b1729" stroke="#344761" stroke-width="2"/><g id="ticks"></g><g id="labels"></g><path id="sector" fill="#5fe0d1" fill-opacity=".14" stroke="none"/><path id="arc" fill="none" stroke="#5fe0d1" stroke-width="5" stroke-linecap="round" marker-end="url(#arrowA)"/><line x1="220" y1="220" x2="220" y2="66" stroke="#e9f0fa" stroke-width="3"/><line id="hand" x1="220" y1="220" x2="220" y2="66" stroke="#ffbb73" stroke-width="5" stroke-linecap="round"/><circle cx="220" cy="220" r="8" fill="#fff"/><text x="220" y="18" text-anchor="middle" font-size="13" fill="#cbd8e9">開始方向・0°</text></svg></div><div class="degree" id="bigDegree" aria-live="polite">90<small>°</small></div><div class="metrics"><div class="metric"><label>回転量（1回転に対する割合）</label><strong id="fraction">1/4 回転</strong></div><div class="metric"><label>回転方向</label><strong id="directionText">左回転 ↶</strong></div></div><div class="note">白線が開始方向、オレンジ線が終了方向です。<br>緑色の円弧が回転した範囲を表します。</div></section>
-<section class="card controls"><div><div class="section-label">01 / 回転方向</div><div class="seg"><button id="left" aria-pressed="true">↶ 左回転</button><button id="right" aria-pressed="false">↷ 右回転</button></div></div><div><div class="slider-top"><label class="section-label" for="angle">02 / 回転角度</label><output id="sliderValue" for="angle">90°</output></div><input id="angle" type="range" min="0" max="360" step="1" value="90" aria-label="回転角度"><div class="scale"><span>0°</span><span>90°</span><span>180°</span><span>270°</span><span>360°</span></div></div><div><div class="section-label">03 / 基本回転量を選択</div><div class="presets" id="presets"><button data-angle="0">0°<span>回転なし</span></button><button data-angle="45">45°<span>1/8</span></button><button data-angle="90">90°<span>1/4</span></button><button data-angle="135">135°<span>3/8</span></button><button data-angle="180">180°<span>1/2</span></button><button data-angle="225">225°<span>5/8</span></button><button data-angle="270">270°<span>3/4</span></button><button data-angle="315">315°<span>7/8</span></button><button data-angle="360">360°<span>1回転</span></button></div></div><div><div class="section-label">04 / 便利な操作</div><div class="toolbar"><button class="smallbtn" id="minus">－ 1°</button><button class="smallbtn" id="plus">＋ 1°</button><button class="smallbtn" id="reset">リセット</button></div></div><div class="note">1°刻みで調整可能。スマホではスライダーを指で左右に動かしてください。パソコンでは矢印キーでも調整できます。</div></section>
+
+<div class="app-container">
+  <header>
+    <div class="brand-title">BALLROOM ROTATION LAB</div>
+    <div class="app-subtitle">回転量ビジュアライザー</div>
+  </header>
+
+  <main class="main-card">
+    <div class="card-top-label">LIVE ROTATION</div>
+
+    <div class="visualizer-area">
+      <div class="start-dir-label">開始方向・0°</div>
+      <div class="svg-wrapper">
+        <svg viewBox="-145 -145 290 290" id="dialSvg">
+          <!-- 外周円 -->
+          <circle cx="0" cy="0" r="105" fill="none" stroke="#2d374d" stroke-width="1.5" />
+          <!-- 目盛りとラベルはJSで生成 -->
+          <g id="ticksGroup"></g>
+          <!-- 扇形 -->
+          <path id="sectorPath" fill="rgba(45, 212, 191, 0.22)" />
+          <!-- 円弧のハイライト -->
+          <path id="arcPath" fill="none" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round" />
+          <!-- 開始線（0度） -->
+          <line x1="0" y1="0" x2="0" y2="-105" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+          <!-- 終了線（回転後） -->
+          <line id="endLine" x1="0" y1="0" x2="-74.2" y2="-74.2" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" />
+          <!-- 中心点 -->
+          <circle cx="0" cy="0" r="5" fill="#ffffff" />
+        </svg>
+      </div>
+    </div>
+
+    <div>
+      <div class="status-row">
+        <div class="degree-display" id="degreeText">45°</div>
+        <div class="status-badge" id="badgeText">1/8 ・ 左回転</div>
+      </div>
+
+      <div class="control-box">
+        <div class="box-header">
+          <span>角度スライダー (0° - 360°)</span>
+          <span>5°刻み</span>
+        </div>
+        <input type="range" id="angleSlider" min="0" max="360" step="5" value="45">
+      </div>
+
+      <div class="bottom-grid">
+        <div class="grid-box">
+          <div class="grid-box-title">回転量 (1回転に対する割合)</div>
+          <div class="fraction-grid" id="fractionBtns">
+            <button data-deg="45" class="active">1/8</button>
+            <button data-deg="90">1/4</button>
+            <button data-deg="135">3/8</button>
+            <button data-deg="180">1/2</button>
+            <button data-deg="225">5/8</button>
+            <button data-deg="270">3/4</button>
+            <button data-deg="315">7/8</button>
+            <button data-deg="360">1周</button>
+          </div>
+        </div>
+
+        <div class="grid-box">
+          <div class="grid-box-title">回転方向</div>
+          <div class="dir-grid">
+            <button id="btnLeft" class="active">左回転 (L)</button>
+            <button id="btnRight">右回転 (R)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
-<section class="card guide"><h2>回転量の読み方</h2><div class="guide-grid"><div class="guide-item"><b>1/8回転 = 45°</b>円を8等分したうちの1つ分です。</div><div class="guide-item"><b>1/4回転 = 90°</b>正面から横方向へ向く角度です。</div><div class="guide-item"><b>1/2回転 = 180°</b>開始方向の真後ろを向きます。</div></div><p class="note">注意：これは回転角度を理解するための模式図です。実際の社交ダンスでは、足・骨盤・胸郭の回転量やタイミングが必ずしも一致するわけではありません。</p></section>
-<footer>Ballroom Rotation Lab ・ オフライン対応 / 外部ライブラリ不使用</footer>
-</main>
+
 <script>
-(function(){'use strict';
-const angle=document.getElementById('angle'),sliderValue=document.getElementById('sliderValue'),bigDegree=document.getElementById('bigDegree'),fraction=document.getElementById('fraction'),directionText=document.getElementById('directionText'),hand=document.getElementById('hand'),arc=document.getElementById('arc'),sector=document.getElementById('sector'),presets=document.querySelectorAll('[data-angle]'),left=document.getElementById('left'),right=document.getElementById('right');let dir=-1;
-const ns='http://www.w3.org/2000/svg',cx=220,cy=220,r=154;
-function pt(deg,radius=r){const a=(deg-90)*Math.PI/180;return [cx+radius*Math.cos(a),cy+radius*Math.sin(a)];}
-const ticks=document.getElementById('ticks'),labels=document.getElementById('labels');for(let i=0;i<24;i++){const a=i*15,p=pt(a,161),q=pt(a,i%3===0?145:154),line=document.createElementNS(ns,'line');line.setAttribute('x1',p[0]);line.setAttribute('y1',p[1]);line.setAttribute('x2',q[0]);line.setAttribute('y2',q[1]);line.setAttribute('stroke',i%3===0?'#90a9c6':'#536985');line.setAttribute('stroke-width',i%3===0?'2':'1');ticks.appendChild(line);}for(let i=0;i<8;i++){let a=i*45,p=pt(a,184),t=document.createElementNS(ns,'text');t.setAttribute('x',p[0]);t.setAttribute('y',p[1]+5);t.setAttribute('fill','#b9cbe0');t.setAttribute('font-size','13');t.setAttribute('text-anchor','middle');t.textContent=a+'°';labels.appendChild(t);}
-function gcd(a,b){while(b){let t=a%b;a=b;b=t;}return a;}
-function fractionText(n){if(n===0)return '0 回転';if(n===360)return '1 回転';let d=gcd(n,360);return n/d+'/'+360/d+' 回転';}
-function render(){let a=Number(angle.value),end=dir*a,p=pt(end),start=pt(0);sliderValue.textContent=a+'°';bigDegree.innerHTML=a+'<small>°</small>';fraction.textContent=fractionText(a);directionText.textContent=dir===-1?'左回転 ↶':'右回転 ↷';hand.setAttribute('x2',p[0]);hand.setAttribute('y2',p[1]);const sweep=dir===1?1:0;let draw=a===360?359.999:a;if(draw===0){arc.setAttribute('d','');sector.setAttribute('d','');}else{let e=pt(dir*draw),large=draw>180?1:0;arc.setAttribute('d',`M ${start[0]} ${start[1]} A ${r} ${r} 0 ${large} ${sweep} ${e[0]} ${e[1]}`);sector.setAttribute('d',`M ${cx} ${cy} L ${start[0]} ${start[1]} A ${r} ${r} 0 ${large} ${sweep} ${e[0]} ${e[1]} Z`);}presets.forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.angle)===a?'true':'false'));left.setAttribute('aria-pressed',String(dir===-1));right.setAttribute('aria-pressed',String(dir===1));}
-angle.addEventListener('input',render);left.addEventListener('click',()=>{dir=-1;render();});right.addEventListener('click',()=>{dir=1;render();});presets.forEach(b=>b.addEventListener('click',()=>{angle.value=b.dataset.angle;render();}));document.getElementById('minus').addEventListener('click',()=>{angle.value=Math.max(0,Number(angle.value)-1);render();});document.getElementById('plus').addEventListener('click',()=>{angle.value=Math.min(360,Number(angle.value)+1);render();});document.getElementById('reset').addEventListener('click',()=>{angle.value=90;dir=-1;render();});render();
-})();
+  let currentDeg = 45;
+  let direction = 'L'; // 'L' = 左回転(反時計回り), 'R' = 右回転(時計回り)
+
+  const radius = 105;
+  const ticksGroup = document.getElementById('ticksGroup');
+  const sectorPath = document.getElementById('sectorPath');
+  const arcPath = document.getElementById('arcPath');
+  const endLine = document.getElementById('endLine');
+  const degreeText = document.getElementById('degreeText');
+  const badgeText = document.getElementById('badgeText');
+  const angleSlider = document.getElementById('angleSlider');
+  const fractionBtns = document.querySelectorAll('#fractionBtns button');
+  const btnLeft = document.getElementById('btnLeft');
+  const btnRight = document.getElementById('btnRight');
+
+  const fractionMap = {
+    45: '1/8',
+    90: '1/4',
+    135: '3/8',
+    180: '1/2',
+    225: '5/8',
+    270: '3/4',
+    315: '7/8',
+    360: '1周'
+  };
+
+  // 目盛りと角度ラベルの描画
+  function initDial() {
+    for (let deg = 0; deg < 360; deg += 45) {
+      const rad = (deg - 90) * Math.PI / 180;
+      const x1 = Math.cos(rad) * (radius - 6);
+      const y1 = Math.sin(rad) * (radius - 6);
+      const x2 = Math.cos(rad) * radius;
+      const y2 = Math.sin(rad) * radius;
+
+      const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      tick.setAttribute('x1', x1);
+      tick.setAttribute('y1', y1);
+      tick.setAttribute('x2', x2);
+      tick.setAttribute('y2', y2);
+      tick.setAttribute('stroke', '#475569');
+      tick.setAttribute('stroke-width', '1.5');
+      ticksGroup.appendChild(tick);
+
+      const lx = Math.cos(rad) * (radius + 20);
+      const ly = Math.sin(rad) * (radius + 20);
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', lx);
+      label.setAttribute('y', ly);
+      label.setAttribute('fill', '#94a3b8');
+      label.setAttribute('font-size', '11');
+      label.setAttribute('font-weight', '600');
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('dominant-baseline', 'middle');
+      label.textContent = deg + '°';
+      ticksGroup.appendChild(label);
+    }
+  }
+
+  function updateUI() {
+    degreeText.textContent = currentDeg + '°';
+    angleSlider.value = currentDeg;
+
+    // スライダーの塗りつぶし割合
+    const pct = (currentDeg / 360) * 100;
+    angleSlider.style.background = `linear-gradient(to right, #2dd4bf ${pct}%, #2b354b ${pct}%)`;
+
+    // バッジ更新
+    const fracStr = fractionMap[currentDeg] ? `${fractionMap[currentDeg]} ・ ` : '';
+    const dirStr = direction === 'L' ? '左回転' : '右回転';
+    badgeText.textContent = fracStr + dirStr;
+
+    // 分数ボタンのアクティブ状態
+    fractionBtns.forEach(btn => {
+      if (parseInt(btn.dataset.deg) === currentDeg) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // 回転方向ボタンのアクティブ状態
+    if (direction === 'L') {
+      btnLeft.classList.add('active');
+      btnRight.classList.remove('active');
+    } else {
+      btnRight.classList.add('active');
+      btnLeft.classList.remove('active');
+    }
+
+    // SVG描画更新
+    const signedDeg = direction === 'L' ? -currentDeg : currentDeg;
+    const endRad = (signedDeg - 90) * Math.PI / 180;
+    const endX = Math.cos(endRad) * radius;
+    const endY = Math.sin(endRad) * radius;
+
+    endLine.setAttribute('x2', endX);
+    endLine.setAttribute('y2', endY);
+
+    if (currentDeg === 0) {
+      sectorPath.setAttribute('d', '');
+      arcPath.setAttribute('d', '');
+    } else if (currentDeg === 360) {
+      sectorPath.setAttribute('d', `M 0 0 m -${radius}, 0 a ${radius},${radius} 0 1,0 ${radius * 2},0 a ${radius},${radius} 0 1,0 -${radius * 2},0`);
+      arcPath.setAttribute('d', `M 0 -${radius} A ${radius} ${radius} 0 1 1 -0.01 -${radius}`);
+    } else {
+      const largeArcFlag = currentDeg > 180 ? 1 : 0;
+      const sweepFlag = direction === 'R' ? 1 : 0;
+
+      const dSector = [
+        `M 0 0`,
+        `L 0 -${radius}`,
+        `A ${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${endX} ${endY}`,
+        `Z`
+      ].join(' ');
+
+      const dArc = [
+        `M 0 -${radius}`,
+        `A ${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${endX} ${endY}`
+      ].join(' ');
+
+      sectorPath.setAttribute('d', dSector);
+      arcPath.setAttribute('d', dArc);
+    }
+  }
+
+  angleSlider.addEventListener('input', (e) => {
+    currentDeg = parseInt(e.target.value);
+    updateUI();
+  });
+
+  fractionBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentDeg = parseInt(btn.dataset.deg);
+      updateUI();
+    });
+  });
+
+  btnLeft.addEventListener('click', () => {
+    direction = 'L';
+    updateUI();
+  });
+
+  btnRight.addEventListener('click', () => {
+    direction = 'R';
+    updateUI();
+  });
+
+  initDial();
+  updateUI();
 </script>
 </body>
 </html>
